@@ -105,6 +105,49 @@
           setColor(initialRed, initialGreen, initialBlue);
         }
       };
+    })
+    .directive('ppFunkyPath', function ($window, scroll) {
+      return {
+        type: 'svg',
+        restrict: 'E',
+        replace: true,
+        templateUrl: 'funky-path-template.html',
+        link: function (scope) {
+          function setPathDefinition () {
+            scope.pathDefinition =
+              'M ' +
+              currentVertices.map(function (vertex) {
+                return '' + vertex.x + ' ' + vertex.y + ' ';
+              }).join('L ') +
+              'Z';
+          }
+
+          var lozengeVertices = [
+            {x: 50, y: 0},
+            {x: 100, y: 50},
+            {x: 50, y: 100},
+            {x: 0, y: 50}
+          ], triangleVertices = [
+            {x: 50, y: 0},
+            {x: 93.3, y: 75},
+            {x: 50, y: 75},
+            {x: 6.7, y: 75}
+          ];
+          var currentVertices = angular.copy(lozengeVertices);
+
+          setPathDefinition();
+
+          angular.element($window).on('scroll', function () {
+            var relativePosition = scroll.getRelativePosition();
+            for (var i = 0; i < 4; i++) {
+              ['x', 'y'].forEach(function (coord) {
+                currentVertices[i][coord] = lozengeVertices[i][coord] + (triangleVertices[i][coord] - lozengeVertices[i][coord]) * relativePosition;
+              });
+            }
+            scope.$apply(setPathDefinition);
+          });
+        }
+      };
     });
 
 })();
