@@ -66,9 +66,9 @@
           }
 
           var previousScrollDirection = 1,
-              initialRed = getRandomColor(),
-              initialGreen = getRandomColor(),
-              initialBlue = getRandomColor(),
+              initialRed = previousRed = getRandomColor(),
+              initialGreen = previousGreen = getRandomColor(),
+              initialBlue = previousBlue = getRandomColor(),
               initialRelativePosition = previousRelativePosition = scroll.getRelativePosition(),
               finalRelativePosition = 1,
               finalRed = getRandomColor(),
@@ -79,16 +79,27 @@
             var currentRelativePosition = scroll.getRelativePosition(),
                 currentScrollDirection = (currentRelativePosition - previousRelativePosition > 0 ? 1 : -1);
             if (currentScrollDirection === previousScrollDirection) {
-              var colorRelativePosition = (currentRelativePosition - initialRelativePosition) / (finalRelativePosition - initialRelativePosition),
-                  currentRed = getIntermediateColor(initialRed, finalRed, colorRelativePosition),
-                  currentGreen = getIntermediateColor(initialGreen, finalGreen, colorRelativePosition),
-                  currentBlue = getIntermediateColor(initialBlue, finalBlue, colorRelativePosition);
-              setColor(currentRed, currentGreen, currentBlue);
-            } else {
 
+            } else {
+              initialRelativePosition = previousRelativePosition;
+              initialRed = previousRed;
+              initialGreen = previousGreen;
+              initialBlue = previousBlue;
+              finalRelativePosition = (currentScrollDirection === 1 ? 1 : 0);
+              finalRed = getRandomColor();
+              finalGreen = getRandomColor();
+              finalBlue = getRandomColor();
             }
+            var colorRelativePosition = (currentRelativePosition - initialRelativePosition) / (finalRelativePosition - initialRelativePosition),
+                currentRed = getIntermediateColor(initialRed, finalRed, colorRelativePosition),
+                currentGreen = getIntermediateColor(initialGreen, finalGreen, colorRelativePosition),
+                currentBlue = getIntermediateColor(initialBlue, finalBlue, colorRelativePosition);
+            setColor(currentRed, currentGreen, currentBlue);
             previousRelativePosition = currentRelativePosition;
             previousScrollDirection = currentScrollDirection;
+            previousRed = currentRed;
+            previousGreen = currentGreen;
+            previousBlue = currentBlue;
           });
 
           setColor(initialRed, initialGreen, initialBlue);
