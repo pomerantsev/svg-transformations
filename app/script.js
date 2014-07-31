@@ -151,19 +151,19 @@
           }
 
           var lozengeVertices = [
-            {x: 50, y: 0},
-            {x: 100, y: 50},
-            {x: 50, y: 100},
-            {x: 0, y: 50}
+            {x: 60, y: 10},
+            {x: 110, y: 60},
+            {x: 60, y: 110},
+            {x: 10, y: 60}
           ], triangleVerticesWithOneAdditional = [
-            {x: 50, y: 0},
-            {x: 93.3, y: 75},
-            {x: 50, y: 75},
-            {x: 6.7, y: 75}
+            {x: 60, y: 10},
+            {x: 103.3, y: 85},
+            {x: 60, y: 85},
+            {x: 16.7, y: 85}
           ], triangleVertices = [
-            {x: 50, y: 0},
-            {x: 93.3, y: 75},
-            {x: 6.7, y: 75}
+            {x: 60, y: 10},
+            {x: 103.3, y: 85},
+            {x: 16.7, y: 85}
           ],
           minArcRadius = 50,
           currentVertices = angular.copy(lozengeVertices);
