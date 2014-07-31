@@ -23,7 +23,7 @@
         replace: true,
         transclude: true,
         scope: {},
-        template: '<div ng-transclude ng-style="{transform: \'translateY(\' + yTranslate + \'px)\'}"></div>',
+        templateUrl: 'inverse-scrolling-template.html',
         link: function (scope, element) {
           function getYTranslate () {
             var scrollHeight = $window.innerHeight - element[0].offsetHeight;
