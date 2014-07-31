@@ -140,8 +140,8 @@
               scope.pathDefinition =
                 'M ' + triangleVertices[2].x + ' ' + triangleVertices[2].y + ' ' +
                 triangleVertices.map(function (vertex) {
-                  return 'A ' + radius + ' ' + radius + ' 0 0 1 ' + vertex.x + ' ' + vertex.y + ' ';
-                });
+                  return 'A ' + radius + ' ' + radius + ' 0 0 1 ' + vertex.x + ' ' + vertex.y;
+                }).join(' ');
             });
           }
         }
