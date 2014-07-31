@@ -10,7 +10,7 @@
         getRelativePosition: function () {
           var scrollHeight = $document[0].body.offsetHeight - $window.innerHeight;
           if (scrollHeight > 0) {
-            return $window.pageYOffset / scrollHeight;
+            return Math.max(Math.min($window.pageYOffset / scrollHeight, 1), 0);
           } else {
             return 0;
           }
@@ -28,7 +28,7 @@
           function getYTranslate () {
             var scrollHeight = $window.innerHeight - element[0].offsetHeight;
             if (scrollHeight > 0) {
-              return Math.min($window.pageYOffset + scrollHeight * scroll.getRelativePosition(), $document[0].body.offsetHeight - element[0].offsetHeight);
+              return Math.max(Math.min($window.pageYOffset + scrollHeight * scroll.getRelativePosition(), $document[0].body.offsetHeight - element[0].offsetHeight), 0);
             } else {
               return 0;
             }
@@ -65,22 +65,17 @@
             return Math.round(initial + (final - initial) * relative);
           }
 
-          var previousScrollDirection = 1,
+          var previousScrollDirection,
               initialRed = previousRed = getRandomColor(),
               initialGreen = previousGreen = getRandomColor(),
               initialBlue = previousBlue = getRandomColor(),
               initialRelativePosition = previousRelativePosition = scroll.getRelativePosition(),
-              finalRelativePosition = 1,
-              finalRed = getRandomColor(),
-              finalGreen = getRandomColor(),
-              finalBlue = getRandomColor();
+              finalRelativePosition;
 
           angular.element($window).on('scroll', function () {
             var currentRelativePosition = scroll.getRelativePosition(),
                 currentScrollDirection = (currentRelativePosition - previousRelativePosition > 0 ? 1 : -1);
-            if (currentScrollDirection === previousScrollDirection) {
-
-            } else {
+            if (!previousScrollDirection || currentScrollDirection !== previousScrollDirection) {
               initialRelativePosition = previousRelativePosition;
               initialRed = previousRed;
               initialGreen = previousGreen;
@@ -90,7 +85,7 @@
               finalGreen = getRandomColor();
               finalBlue = getRandomColor();
             }
-            var colorRelativePosition = (currentRelativePosition - initialRelativePosition) / (finalRelativePosition - initialRelativePosition),
+            var colorRelativePosition = (finalRelativePosition === initialRelativePosition ? 0 : (currentRelativePosition - initialRelativePosition) / (finalRelativePosition - initialRelativePosition)),
                 currentRed = getIntermediateColor(initialRed, finalRed, colorRelativePosition),
                 currentGreen = getIntermediateColor(initialGreen, finalGreen, colorRelativePosition),
                 currentBlue = getIntermediateColor(initialBlue, finalBlue, colorRelativePosition);
