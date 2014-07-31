@@ -5,6 +5,7 @@ body {
 
 .funky-element {
   display: block;
-  width: 20%;
+  width: 20vw;
+  height: 20vw;
   margin: 0 auto;
 }
