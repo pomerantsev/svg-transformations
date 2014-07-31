@@ -12,15 +12,35 @@
     };
   }
 
-  function scrollFactory ($window, $document) {
+  function scrollFactory ($window, $document, $timeout) {
+    function getAbsolutePosition () {
+      return -scroll.y;
+    }
+    var scroll,
+        wrapperHeight,
+        scrollableHeight;
     return {
+      initializeScroll: function (element) {
+        scroll = new IScroll(element[0], {
+          probeType: 3,
+          mouseWheel: true
+        });
+        wrapperHeight = element[0].offsetHeight;
+        scrollableHeight = element.children()[0].offsetHeight;
+      },
       getRelativePosition: function () {
-        var scrollHeight = $document[0].body.offsetHeight - $window.innerHeight;
+        var scrollHeight = scrollableHeight - wrapperHeight;
         if (scrollHeight > 0) {
-          return Math.max(Math.min($window.pageYOffset / scrollHeight, 1), 0);
+          return Math.max(Math.min(getAbsolutePosition() / scrollHeight, 1), 0);
         } else {
           return 0;
         }
+      },
+      getAbsolutePosition: getAbsolutePosition,
+      setScrollHandler: function (callback) {
+        $timeout(function () {
+          scroll.on('scroll', callback);
+        });
       }
     };
   }
@@ -34,9 +54,9 @@
       templateUrl: 'inverse-scrolling-template.html',
       link: function (scope, element) {
         function getYTranslate () {
-          var scrollHeight = $window.innerHeight - element[0].offsetHeight;
+          var scrollHeight = element[0].offsetHeight - element.children().children()[0].offsetHeight;
           if (scrollHeight > 0) {
-            return Math.max(Math.min($window.pageYOffset + scrollHeight * scroll.getRelativePosition(), $document[0].body.offsetHeight - element[0].offsetHeight), 0);
+            return scroll.getAbsolutePosition() + scrollHeight * scroll.getRelativePosition();
           } else {
             return 0;
           }
@@ -48,9 +68,11 @@
           });
         }
 
+        scroll.initializeScroll(element);
+
         updateTranslate();
 
-        angular.element($window).on('scroll', updateTranslate);
+        scroll.setScrollHandler(updateTranslate);
       }
     };
   }
@@ -91,7 +113,7 @@
 
         setColor(initialColor);
 
-        angular.element($window).on('scroll', function () {
+        scroll.setScrollHandler(function () {
           var currentRelativePosition = scroll.getRelativePosition(),
               currentScrollDirection = (currentRelativePosition - previousRelativePosition > 0 ? 1 : -1);
           if (!previousScrollDirection || currentScrollDirection !== previousScrollDirection) {
@@ -166,7 +188,7 @@
 
         updatePath();
 
-        angular.element($window).on('scroll', updatePath);
+        scroll.setScrollHandler(updatePath);
       }
     };
   }

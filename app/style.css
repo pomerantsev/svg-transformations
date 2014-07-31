@@ -1,6 +1,10 @@
+html {
+  height: 100%;
+}
+
 body {
-  height: 3000px;
   margin: 0;
+  height: 100%;
 }
 
 .funky-element {
