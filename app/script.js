@@ -134,7 +134,7 @@
       type: 'svg',
       restrict: 'E',
       replace: true,
-      templateUrl: 'funky-path-template.html',
+      template: '<path d="{{pathDefinition}}" />',
       link: function (scope) {
         function updatePath () {
           var relativePosition = scroll.getRelativePosition();
