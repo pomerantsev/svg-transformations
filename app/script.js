@@ -113,7 +113,7 @@
         replace: true,
         templateUrl: 'funky-path-template.html',
         link: function (scope) {
-          function setPathDefinition () {
+          function setLozengeToTrianglePathDefinition () {
             scope.pathDefinition =
               'M ' +
               currentVertices.map(function (vertex) {
@@ -127,24 +127,40 @@
             {x: 100, y: 50},
             {x: 50, y: 100},
             {x: 0, y: 50}
-          ], triangleVertices = [
+          ], triangleVerticesWithOneAdditional = [
             {x: 50, y: 0},
             {x: 93.3, y: 75},
             {x: 50, y: 75},
             {x: 6.7, y: 75}
-          ];
+          ], triangleVertices = [
+            {x: 50, y: 0},
+            {x: 93.3, y: 75},
+            {x: 6.7, y: 75}
+          ],
+          minArcRadius = 50;
           var currentVertices = angular.copy(lozengeVertices);
 
-          setPathDefinition();
+          setLozengeToTrianglePathDefinition();
 
           angular.element($window).on('scroll', function () {
             var relativePosition = scroll.getRelativePosition();
-            for (var i = 0; i < 4; i++) {
-              ['x', 'y'].forEach(function (coord) {
-                currentVertices[i][coord] = lozengeVertices[i][coord] + (triangleVertices[i][coord] - lozengeVertices[i][coord]) * relativePosition;
+            if (relativePosition <= 0.5) {
+              for (var i = 0; i < 4; i++) {
+                ['x', 'y'].forEach(function (coord) {
+                  currentVertices[i][coord] = lozengeVertices[i][coord] + (triangleVerticesWithOneAdditional[i][coord] - lozengeVertices[i][coord]) * relativePosition * 2;
+                });
+              }
+              scope.$apply(setLozengeToTrianglePathDefinition);
+            } else {
+              var radius = 50 / (2 * relativePosition - 1);
+              scope.$apply(function () {
+                scope.pathDefinition =
+                  'M ' + triangleVertices[2].x + ' ' + triangleVertices[2].y + ' ' +
+                  triangleVertices.map(function (vertex) {
+                    return 'A ' + radius + ' ' + radius + ' 0 0 1 ' + vertex.x + ' ' + vertex.y + ' ';
+                  });
               });
             }
-            scope.$apply(setPathDefinition);
           });
         }
       };
