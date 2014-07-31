@@ -59,12 +59,15 @@
     return {
       link: function (scope, element, attrs) {
         function getRandomColor() {
-          return Math.floor(Math.random() * 256);
+          function getRandomPrimaryColor () {
+            return Math.floor(Math.random() * 256);
+          }
+          return [getRandomPrimaryColor(), getRandomPrimaryColor(), getRandomPrimaryColor()];
         }
 
-        function setColor (r, g, b) {
+        function setColor (color) {
           function getFullColor () {
-            return 'rgb(' + r + ', ' + g + ', ' + b + ')';
+            return 'rgb(' + color[0] + ', ' + color[1] + ', ' + color[2] + ')';
           }
           element.css({
             stroke: getFullColor(),
@@ -72,43 +75,38 @@
           });
         }
 
-        function getIntermediateColor (initial, final, relative) {
-          return Math.round(initial + (final - initial) * relative);
+        function getIntermediateColor (initialColor, finalColor, relative) {
+          var intermediateColor = [];
+          for (var i = 0; i < 3; i++) {
+            intermediateColor[i] = Math.round(initialColor[i] + (finalColor[i] - initialColor[i]) * relative);
+          }
+          return intermediateColor;
         }
 
         var previousScrollDirection,
-            initialRed = previousRed = getRandomColor(),
-            initialGreen = previousGreen = getRandomColor(),
-            initialBlue = previousBlue = getRandomColor(),
+            initialColor = getRandomColor(),
+            previousColor = angular.copy(initialColor),
             initialRelativePosition = previousRelativePosition = scroll.getRelativePosition(),
             finalRelativePosition;
+
+        setColor(initialColor);
 
         angular.element($window).on('scroll', function () {
           var currentRelativePosition = scroll.getRelativePosition(),
               currentScrollDirection = (currentRelativePosition - previousRelativePosition > 0 ? 1 : -1);
           if (!previousScrollDirection || currentScrollDirection !== previousScrollDirection) {
             initialRelativePosition = previousRelativePosition;
-            initialRed = previousRed;
-            initialGreen = previousGreen;
-            initialBlue = previousBlue;
+            initialColor = angular.copy(previousColor);
             finalRelativePosition = (currentScrollDirection === 1 ? 1 : 0);
-            finalRed = getRandomColor();
-            finalGreen = getRandomColor();
-            finalBlue = getRandomColor();
+            finalColor = getRandomColor();
           }
           var colorRelativePosition = (finalRelativePosition === initialRelativePosition ? 0 : (currentRelativePosition - initialRelativePosition) / (finalRelativePosition - initialRelativePosition)),
-              currentRed = getIntermediateColor(initialRed, finalRed, colorRelativePosition),
-              currentGreen = getIntermediateColor(initialGreen, finalGreen, colorRelativePosition),
-              currentBlue = getIntermediateColor(initialBlue, finalBlue, colorRelativePosition);
-          setColor(currentRed, currentGreen, currentBlue);
+              currentColor = getIntermediateColor(initialColor, finalColor, colorRelativePosition);
+          setColor(currentColor);
           previousRelativePosition = currentRelativePosition;
           previousScrollDirection = currentScrollDirection;
-          previousRed = currentRed;
-          previousGreen = currentGreen;
-          previousBlue = currentBlue;
+          previousColor = angular.copy(currentColor);
         });
-
-        setColor(initialRed, initialGreen, initialBlue);
       }
     };
   }
