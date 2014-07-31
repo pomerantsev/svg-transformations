@@ -5,6 +5,18 @@
   angular.module('app', [])
     .controller('MainController', function ($scope, $window, $document) {
     })
+    .factory('utils', function () {
+      return {
+        safeApply: function (scope, callback) {
+          var phase = scope.$root.$$phase;
+          if(phase === '$apply' || phase === '$digest') {
+            scope.$eval(callback);
+          } else {
+            scope.$apply(callback);
+          }
+        }
+      };
+    })
     .factory('scroll', function ($window, $document) {
       return {
         getRelativePosition: function () {
@@ -17,7 +29,7 @@
         }
       };
     })
-    .directive('ppInverseScrolling', function ($window, $document, scroll) {
+    .directive('ppInverseScrolling', function ($window, $document, utils, scroll) {
       return {
         restrict: 'E',
         replace: true,
@@ -34,13 +46,15 @@
             }
           }
 
-          scope.yTranslate = 0;
-
-          angular.element($window).on('scroll', function () {
-            scope.$apply(function () {
+          function updateTranslate () {
+            utils.safeApply(scope, function () {
               scope.yTranslate = getYTranslate();
             });
-          });
+          }
+
+          updateTranslate();
+
+          angular.element($window).on('scroll', updateTranslate);
         }
       };
     })
@@ -101,20 +115,39 @@
         }
       };
     })
-    .directive('ppFunkyPath', function ($window, scroll) {
+    .directive('ppFunkyPath', function ($window, utils, scroll) {
       return {
         type: 'svg',
         restrict: 'E',
         replace: true,
         templateUrl: 'funky-path-template.html',
         link: function (scope) {
-          function setLozengeToTrianglePathDefinition () {
-            scope.pathDefinition =
-              'M ' +
-              currentVertices.map(function (vertex) {
-                return '' + vertex.x + ' ' + vertex.y + ' ';
-              }).join('L ') +
-              'Z';
+          function updatePath () {
+            var relativePosition = scroll.getRelativePosition();
+            if (relativePosition <= 0.5) {
+              for (var i = 0; i < 4; i++) {
+                ['x', 'y'].forEach(function (coord) {
+                  currentVertices[i][coord] = lozengeVertices[i][coord] + (triangleVerticesWithOneAdditional[i][coord] - lozengeVertices[i][coord]) * relativePosition * 2;
+                });
+              }
+              utils.safeApply(scope, function () {
+                scope.pathDefinition =
+                  'M ' +
+                  currentVertices.map(function (vertex) {
+                    return '' + vertex.x + ' ' + vertex.y + ' ';
+                  }).join('L ') +
+                  'Z';
+              });
+            } else {
+              var radius = 50 / (2 * relativePosition - 1);
+              utils.safeApply(scope, function () {
+                scope.pathDefinition =
+                  'M ' + triangleVertices[2].x + ' ' + triangleVertices[2].y + ' ' +
+                  triangleVertices.map(function (vertex) {
+                    return 'A ' + radius + ' ' + radius + ' 0 0 1 ' + vertex.x + ' ' + vertex.y + ' ';
+                  });
+              });
+            }
           }
 
           var lozengeVertices = [
@@ -132,31 +165,12 @@
             {x: 93.3, y: 75},
             {x: 6.7, y: 75}
           ],
-          minArcRadius = 50;
-          var currentVertices = angular.copy(lozengeVertices);
+          minArcRadius = 50,
+          currentVertices = angular.copy(lozengeVertices);
 
-          setLozengeToTrianglePathDefinition();
+          updatePath();
 
-          angular.element($window).on('scroll', function () {
-            var relativePosition = scroll.getRelativePosition();
-            if (relativePosition <= 0.5) {
-              for (var i = 0; i < 4; i++) {
-                ['x', 'y'].forEach(function (coord) {
-                  currentVertices[i][coord] = lozengeVertices[i][coord] + (triangleVerticesWithOneAdditional[i][coord] - lozengeVertices[i][coord]) * relativePosition * 2;
-                });
-              }
-              scope.$apply(setLozengeToTrianglePathDefinition);
-            } else {
-              var radius = 50 / (2 * relativePosition - 1);
-              scope.$apply(function () {
-                scope.pathDefinition =
-                  'M ' + triangleVertices[2].x + ' ' + triangleVertices[2].y + ' ' +
-                  triangleVertices.map(function (vertex) {
-                    return 'A ' + radius + ' ' + radius + ' 0 0 1 ' + vertex.x + ' ' + vertex.y + ' ';
-                  });
-              });
-            }
-          });
+          angular.element($window).on('scroll', updatePath);
         }
       };
     });
