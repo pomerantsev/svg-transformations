@@ -105,29 +105,25 @@
           return intermediateColor;
         }
 
-        var previousScrollDirection,
-            initialColor = getRandomColor(),
-            previousColor = angular.copy(initialColor),
-            initialRelativePosition = previousRelativePosition = scroll.getRelativePosition(),
-            finalRelativePosition;
+        var initialColor = getRandomColor(),
+            finalColor = getRandomColor(),
+            initialRelativePosition = 0,
+            finalRelativePosition = 1;
 
         setColor(initialColor);
 
         scroll.setScrollHandler(function () {
-          var currentRelativePosition = scroll.getRelativePosition(),
-              currentScrollDirection = (currentRelativePosition - previousRelativePosition > 0 ? 1 : -1);
-          if (!previousScrollDirection || currentScrollDirection !== previousScrollDirection) {
-            initialRelativePosition = previousRelativePosition;
-            initialColor = angular.copy(previousColor);
-            finalRelativePosition = (currentScrollDirection === 1 ? 1 : 0);
+          var currentRelativePosition = scroll.getRelativePosition();
+          if (finalRelativePosition === currentRelativePosition) {
+            var tmp = initialRelativePosition;
+            initialRelativePosition = finalRelativePosition;
+            finalRelativePosition = tmp;
+            initialColor = finalColor;
             finalColor = getRandomColor();
           }
-          var colorRelativePosition = (finalRelativePosition === initialRelativePosition ? 0 : (currentRelativePosition - initialRelativePosition) / (finalRelativePosition - initialRelativePosition)),
+          var colorRelativePosition = (currentRelativePosition - initialRelativePosition) / (finalRelativePosition - initialRelativePosition),
               currentColor = getIntermediateColor(initialColor, finalColor, colorRelativePosition);
           setColor(currentColor);
-          previousRelativePosition = currentRelativePosition;
-          previousScrollDirection = currentScrollDirection;
-          previousColor = angular.copy(currentColor);
         });
       }
     };
