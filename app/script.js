@@ -12,7 +12,7 @@
     };
   }
 
-  function scrollFactory ($window, $document, $timeout) {
+  function scrollFactory ($window, $timeout) {
     function getAbsolutePosition () {
       return -scroll.y;
     }
@@ -21,7 +21,7 @@
         scrollableHeight;
     return {
       initializeScroll: function (element) {
-        scroll = new IScroll(element[0], {
+        scroll = new $window.IScroll(element[0], {
           probeType: 3,
           mouseWheel: true
         });
@@ -45,7 +45,7 @@
     };
   }
 
-  function inverseScrollingDirective ($window, $document, utils, scroll) {
+  function inverseScrollingDirective (utils, scroll) {
     return {
       restrict: 'E',
       replace: true,
@@ -77,7 +77,7 @@
     };
   }
 
-  function iridescentDirective ($window, scroll) {
+  function iridescentDirective (scroll) {
     return {
       link: function (scope, element, attrs) {
         function getRandomColor() {
@@ -129,7 +129,7 @@
     };
   }
 
-  function funkyPathDirective ($window, utils, scroll) {
+  function funkyPathDirective (utils, scroll) {
     return {
       type: 'svg',
       restrict: 'E',
@@ -165,22 +165,24 @@
         }
 
         var lozengeVertices = [
-          {x: 60, y: 10},
-          {x: 110, y: 60},
-          {x: 60, y: 110},
-          {x: 10, y: 60}
-        ], triangleVerticesWithOneAdditional = [
-          {x: 60, y: 10},
-          {x: 103.3, y: 85},
-          {x: 60, y: 85},
-          {x: 16.7, y: 85}
-        ], triangleVertices = [
-          {x: 60, y: 10},
-          {x: 103.3, y: 85},
-          {x: 16.7, y: 85}
-        ],
-        minArcRadius = 50,
-        currentVertices = angular.copy(lozengeVertices);
+              {x: 60, y: 10},
+              {x: 110, y: 60},
+              {x: 60, y: 110},
+              {x: 10, y: 60}
+            ],
+            triangleVerticesWithOneAdditional = [
+              {x: 60, y: 10},
+              {x: 103.3, y: 85},
+              {x: 60, y: 85},
+              {x: 16.7, y: 85}
+            ],
+            triangleVertices = [
+              {x: 60, y: 10},
+              {x: 103.3, y: 85},
+              {x: 16.7, y: 85}
+            ],
+            minArcRadius = 50,
+            currentVertices = angular.copy(lozengeVertices);
 
         updatePath();
 
