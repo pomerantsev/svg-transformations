@@ -134,7 +134,7 @@
       type: 'svg',
       restrict: 'E',
       replace: true,
-      template: '<path d="{{pathDefinition}}" />',
+      template: '<path ng-attr-d="{{pathDefinition}}" />',
       link: function (scope) {
         function updatePath () {
           var relativePosition = scroll.getRelativePosition();
