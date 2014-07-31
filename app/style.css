@@ -13,3 +13,14 @@ body {
   height: 20vw;
   margin: 0 auto;
 }
+
+.iscroll-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.iscroll-scrollable {
+  width: 100%;
+  height: 3000px;
+}
